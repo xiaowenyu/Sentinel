@@ -53,6 +53,7 @@ public class FlowRuleManager {
     private static final AtomicReference<Map<String, List<FlowRule>>> flowRules = new AtomicReference<Map<String, List<FlowRule>>>();
 
     private static final FlowPropertyListener LISTENER = new FlowPropertyListener();
+    // 动态参数
     private static SentinelProperty<List<FlowRule>> currentProperty = new DynamicSentinelProperty<List<FlowRule>>();
 
     @SuppressWarnings("PMD.ThreadPoolCreationRule")
@@ -60,7 +61,9 @@ public class FlowRuleManager {
         new NamedThreadFactory("sentinel-metrics-record-task", true));
 
     static {
+        // 初始化空规则
         flowRules.set(Collections.<String, List<FlowRule>>emptyMap());
+        //添加规则的监听器
         currentProperty.addListener(LISTENER);
         startMetricTimerListener();
     }
@@ -120,6 +123,7 @@ public class FlowRuleManager {
      * @param rules new rules to load.
      */
     public static void loadRules(List<FlowRule> rules) {
+        // 更新规则
         currentProperty.updateValue(rules);
     }
 
@@ -156,6 +160,7 @@ public class FlowRuleManager {
             Map<String, List<FlowRule>> rules = FlowRuleUtil.buildFlowRuleMap(value);
             //the rules was always not null, it's no need to check nullable
             //remove checking to avoid IDE warning
+            // 设置规则通知
             flowRules.set(rules);
             RecordLog.info("[FlowRuleManager] Flow rules received: {}", rules);
         }

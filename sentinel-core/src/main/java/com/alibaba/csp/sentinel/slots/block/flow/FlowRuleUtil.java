@@ -89,6 +89,7 @@ public final class FlowRuleUtil {
         Map<K, Set<FlowRule>> tmpMap = new ConcurrentHashMap<>();
 
         for (FlowRule rule : list) {
+            // 过滤出flowRule的规则，并且是可用的
             if (!isValidRule(rule)) {
                 RecordLog.warn("[FlowRuleManager] Ignoring invalid flow rule when loading new flow rules: " + rule);
                 continue;
@@ -97,6 +98,7 @@ public final class FlowRuleUtil {
                 continue;
             }
             if (StringUtil.isBlank(rule.getLimitApp())) {
+                // 设置default
                 rule.setLimitApp(RuleConstant.LIMIT_APP_DEFAULT);
             }
             TrafficShapingController rater = generateRater(rule);

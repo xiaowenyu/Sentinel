@@ -184,6 +184,7 @@ public class FlowRule extends AbstractRule {
         return this;
     }
 
+    // 重写 equal
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }

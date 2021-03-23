@@ -46,7 +46,9 @@ public class FlowQpsDemo {
 
     private static int seconds = 60 + 40;
 
+    // 初始化限流入口
     public static void main(String[] args) throws Exception {
+        // 初始化限流规则
         initFlowQpsRule();
 
         tick();
@@ -61,12 +63,15 @@ public class FlowQpsDemo {
     private static void initFlowQpsRule() {
         List<FlowRule> rules = new ArrayList<FlowRule>();
         FlowRule rule1 = new FlowRule();
+        // 设置资源
         rule1.setResource(KEY);
         // set limit qps to 20
+        // 限制的qps
         rule1.setCount(20);
         rule1.setGrade(RuleConstant.FLOW_GRADE_QPS);
         rule1.setLimitApp("default");
         rules.add(rule1);
+        // 加载规则
         FlowRuleManager.loadRules(rules);
     }
 

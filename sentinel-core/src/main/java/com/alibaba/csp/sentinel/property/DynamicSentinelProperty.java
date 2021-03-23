@@ -50,10 +50,13 @@ public class DynamicSentinelProperty<T> implements SentinelProperty<T> {
         if (isEqual(value, newValue)) {
             return false;
         }
+        // 与原来的规则不一致，更新
         RecordLog.info("[DynamicSentinelProperty] Config will be updated to: {}", newValue);
 
+        // 替换
         value = newValue;
         for (PropertyListener<T> listener : listeners) {
+            // 通知各个slot模块
             listener.configUpdate(newValue);
         }
         return true;
