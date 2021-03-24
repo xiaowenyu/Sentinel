@@ -24,6 +24,7 @@ import com.alibaba.csp.sentinel.log.RecordLog;
 public class DynamicSentinelProperty<T> implements SentinelProperty<T> {
 
     protected Set<PropertyListener<T>> listeners = Collections.synchronizedSet(new HashSet<PropertyListener<T>>());
+    // 缓存规则
     private T value = null;
 
     public DynamicSentinelProperty() {
@@ -37,6 +38,7 @@ public class DynamicSentinelProperty<T> implements SentinelProperty<T> {
     @Override
     public void addListener(PropertyListener<T> listener) {
         listeners.add(listener);
+        // 初始化规则
         listener.configLoad(value);
     }
 
@@ -56,7 +58,7 @@ public class DynamicSentinelProperty<T> implements SentinelProperty<T> {
         // 替换
         value = newValue;
         for (PropertyListener<T> listener : listeners) {
-            // 通知各个slot模块
+            // 通知各个slot模块，以Flows为例
             listener.configUpdate(newValue);
         }
         return true;

@@ -157,6 +157,7 @@ public class FlowRuleManager {
 
         @Override
         public void configUpdate(List<FlowRule> value) {
+            // 将list的规则转化成 map， key为资源，并排好序，全量更新
             Map<String, List<FlowRule>> rules = FlowRuleUtil.buildFlowRuleMap(value);
             //the rules was always not null, it's no need to check nullable
             //remove checking to avoid IDE warning
@@ -167,6 +168,7 @@ public class FlowRuleManager {
 
         @Override
         public void configLoad(List<FlowRule> conf) {
+            // 和 update一样
             Map<String, List<FlowRule>> rules = FlowRuleUtil.buildFlowRuleMap(conf);
             flowRules.set(rules);
             RecordLog.info("[FlowRuleManager] Flow rules loaded: {}", rules);

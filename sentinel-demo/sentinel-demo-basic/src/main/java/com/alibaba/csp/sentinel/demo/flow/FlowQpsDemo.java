@@ -71,7 +71,7 @@ public class FlowQpsDemo {
         rule1.setGrade(RuleConstant.FLOW_GRADE_QPS);
         rule1.setLimitApp("default");
         rules.add(rule1);
-        // 加载规则
+        // 更新规则
         FlowRuleManager.loadRules(rules);
     }
 

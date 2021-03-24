@@ -86,6 +86,7 @@ public final class FlowRuleUtil {
         if (list == null || list.isEmpty()) {
             return newRuleMap;
         }
+        // 临时规则map
         Map<K, Set<FlowRule>> tmpMap = new ConcurrentHashMap<>();
 
         for (FlowRule rule : list) {
@@ -104,10 +105,12 @@ public final class FlowRuleUtil {
             TrafficShapingController rater = generateRater(rule);
             rule.setRater(rater);
 
+            // 获取资源名称
             K key = groupFunction.apply(rule);
             if (key == null) {
                 continue;
             }
+            // 获取资源已有的规则
             Set<FlowRule> flowRules = tmpMap.get(key);
 
             if (flowRules == null) {
@@ -115,16 +118,19 @@ public final class FlowRuleUtil {
                 flowRules = new HashSet<>();
                 tmpMap.put(key, flowRules);
             }
-
+            // 添加规则
             flowRules.add(rule);
         }
+        // 根据 clusterMode和limitApp比较
         Comparator<FlowRule> comparator = new FlowRuleComparator();
         for (Entry<K, Set<FlowRule>> entries : tmpMap.entrySet()) {
             List<FlowRule> rules = new ArrayList<>(entries.getValue());
+            // 对规则排序
             if (shouldSort) {
                 // Sort the rules.
                 Collections.sort(rules, comparator);
             }
+            // 对各个资源名称的规则排序一下
             newRuleMap.put(entries.getKey(), rules);
         }
 
