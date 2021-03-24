@@ -141,6 +141,7 @@ public class FlowQpsDemo {
                 Entry entry = null;
 
                 try {
+                    // 限制入口
                     entry = SphU.entry(KEY);
                     // token acquired, means pass
                     pass.addAndGet(1);

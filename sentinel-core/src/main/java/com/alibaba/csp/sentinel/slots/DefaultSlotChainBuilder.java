@@ -32,11 +32,13 @@ import java.util.List;
  * @author qinan.qn
  * @author leyou
  */
+// 默认的slotChain
 @Spi(isDefault = true)
 public class DefaultSlotChainBuilder implements SlotChainBuilder {
 
     @Override
     public ProcessorSlotChain build() {
+        // 新建默认的处理slot链
         ProcessorSlotChain chain = new DefaultProcessorSlotChain();
 
         List<ProcessorSlot> sortedSlotList = SpiLoader.of(ProcessorSlot.class).loadInstanceListSorted();

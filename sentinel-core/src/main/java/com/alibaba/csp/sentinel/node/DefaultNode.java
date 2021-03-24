@@ -77,6 +77,7 @@ public class DefaultNode extends StatisticNode {
      *
      * @param node valid child node
      */
+    // 添加到set中
     public void addChild(Node node) {
         if (node == null) {
             RecordLog.warn("Trying to add null child to node <{}>, ignored", id.getName());

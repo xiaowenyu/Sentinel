@@ -144,6 +144,7 @@ public interface Sph extends SphResourceTypeSupport {
      * @return the {@link Entry} of this invocation (used for mark the invocation complete and get context data)
      * @throws BlockException if the block criteria is met
      */
+    // 统计和检查资源规则执行情况
     Entry entry(String name, EntryType trafficType, int batchCount, Object... args) throws BlockException;
 
     /**

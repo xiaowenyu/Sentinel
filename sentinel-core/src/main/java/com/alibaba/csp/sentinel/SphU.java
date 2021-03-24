@@ -81,6 +81,7 @@ public class SphU {
      * @return the {@link Entry} of this invocation (used for mark the invocation complete and get context data)
      * @throws BlockException if the block criteria is met (e.g. metric exceeded the threshold of any rules)
      */
+    //  根据资源名限制
     public static Entry entry(String name) throws BlockException {
         return Env.sph.entry(name, EntryType.OUT, 1, OBJECTS0);
     }

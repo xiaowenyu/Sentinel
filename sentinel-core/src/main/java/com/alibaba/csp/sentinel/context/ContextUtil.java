@@ -59,12 +59,15 @@ public class ContextUtil {
 
     static {
         // Cache the entrance node for default context.
+        // 初始化默认上下文
         initDefaultContext();
     }
 
     private static void initDefaultContext() {
         String defaultContextName = Constants.CONTEXT_DEFAULT_NAME;
+        // 新建入口节点
         EntranceNode node = new EntranceNode(new StringResourceWrapper(defaultContextName, EntryType.IN), null);
+        // 添加节点
         Constants.ROOT.addChild(node);
         contextNameNodeMap.put(defaultContextName, node);
     }
@@ -117,16 +120,19 @@ public class ContextUtil {
         return trueEnter(name, origin);
     }
 
+    // sentinel_default_context
     protected static Context trueEnter(String name, String origin) {
         Context context = contextHolder.get();
         if (context == null) {
             Map<String, DefaultNode> localCacheNameMap = contextNameNodeMap;
             DefaultNode node = localCacheNameMap.get(name);
             if (node == null) {
+                // 节点数量大于2000时，返回空的上下文
                 if (localCacheNameMap.size() > Constants.MAX_CONTEXT_NAME_SIZE) {
                     setNullContext();
                     return NULL_CONTEXT;
                 } else {
+                    // 双重检查锁
                     LOCK.lock();
                     try {
                         node = contextNameNodeMap.get(name);
@@ -135,6 +141,7 @@ public class ContextUtil {
                                 setNullContext();
                                 return NULL_CONTEXT;
                             } else {
+                                // 不为空时
                                 node = new EntranceNode(new StringResourceWrapper(name, EntryType.IN), null);
                                 // Add entrance node.
                                 Constants.ROOT.addChild(node);
@@ -150,6 +157,7 @@ public class ContextUtil {
                     }
                 }
             }
+            // 设置新的上下文
             context = new Context(node, name);
             context.setOrigin(origin);
             contextHolder.set(context);

@@ -27,6 +27,7 @@ import com.alibaba.csp.sentinel.ResourceTypeConstants;
 public class StringResourceWrapper extends ResourceWrapper {
 
     public StringResourceWrapper(String name, EntryType e) {
+        // 资源名称，出入口，资源类型
         super(name, e, ResourceTypeConstants.COMMON);
     }
 

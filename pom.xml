@@ -326,6 +326,7 @@
         <profile>
             <id>oss</id>
             <build>
+                <pluginManagement>
                 <plugins>
                     <!-- Source -->
                     <plugin>
@@ -376,6 +377,7 @@
                         </executions>
                     </plugin>
                 </plugins>
+                </pluginManagement>
             </build>
             <distributionManagement>
                 <snapshotRepository>

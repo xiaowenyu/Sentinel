@@ -29,10 +29,12 @@ import com.alibaba.csp.sentinel.init.InitExecutor;
  */
 public class Env {
 
+    // 初始化 统计和检查规则的类
     public static final Sph sph = new CtSph();
 
     static {
         // If init fails, the process will exit.
+        // 初始化spi
         InitExecutor.doInit();
     }
 
