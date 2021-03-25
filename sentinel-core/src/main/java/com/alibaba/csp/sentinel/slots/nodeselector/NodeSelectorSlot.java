@@ -124,6 +124,7 @@ import java.util.Map;
  * @see EntranceNode
  * @see ContextUtil
  */
+// 优先级最高
 @Spi(isSingleton = false, order = Constants.ORDER_NODE_SELECTOR_SLOT)
 public class NodeSelectorSlot extends AbstractLinkedProcessorSlot<Object> {
 
@@ -153,9 +154,11 @@ public class NodeSelectorSlot extends AbstractLinkedProcessorSlot<Object> {
          * The answer is all {@link DefaultNode}s with same resource name share one
          * {@link ClusterNode}. See {@link ClusterBuilderSlot} for detail.
          */
+        // 使用上下文名称而不是资源名称，资源 会拥有多个defaultNode
         DefaultNode node = map.get(context.getName());
         if (node == null) {
             synchronized (this) {
+                //双重检查锁，初始化 contextname，defaultNode
                 node = map.get(context.getName());
                 if (node == null) {
                     node = new DefaultNode(resourceWrapper, null);
@@ -170,12 +173,15 @@ public class NodeSelectorSlot extends AbstractLinkedProcessorSlot<Object> {
             }
         }
 
+        // 设置当前上下文的节点
         context.setCurNode(node);
+        // 传递node下去
         fireEntry(context, resourceWrapper, node, count, prioritized, args);
     }
 
     @Override
     public void exit(Context context, ResourceWrapper resourceWrapper, int count, Object... args) {
+        // 释放资源
         fireExit(context, resourceWrapper, count, args);
     }
 }

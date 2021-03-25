@@ -46,9 +46,11 @@ public class FlowRuleChecker {
         if (ruleProvider == null || resource == null) {
             return;
         }
+        // 限流规则
         Collection<FlowRule> rules = ruleProvider.apply(resource.getName());
         if (rules != null) {
             for (FlowRule rule : rules) {
+                // 检查限流规则
                 if (!canPassCheck(rule, context, node, count, prioritized)) {
                     throw new FlowException(rule.getLimitApp(), rule);
                 }
@@ -64,14 +66,17 @@ public class FlowRuleChecker {
     public boolean canPassCheck(/*@NonNull*/ FlowRule rule, Context context, DefaultNode node, int acquireCount,
                                                     boolean prioritized) {
         String limitApp = rule.getLimitApp();
+        // rule的limitApp不能为空，为空直接跳过
         if (limitApp == null) {
             return true;
         }
 
+        // 如果是集群模式
         if (rule.isClusterMode()) {
             return passClusterCheck(rule, context, node, acquireCount, prioritized);
         }
 
+        // 本地模式
         return passLocalCheck(rule, context, node, acquireCount, prioritized);
     }
 
@@ -82,9 +87,11 @@ public class FlowRuleChecker {
             return true;
         }
 
+        // 执行限流规则
         return rule.getRater().canPass(selectedNode, acquireCount, prioritized);
     }
 
+    // 返回关联节点
     static Node selectReferenceNode(FlowRule rule, Context context, DefaultNode node) {
         String refResource = rule.getRefResource();
         int strategy = rule.getStrategy();
@@ -128,9 +135,11 @@ public class FlowRuleChecker {
         } else if (RuleConstant.LIMIT_APP_DEFAULT.equals(limitApp)) {
             if (strategy == RuleConstant.STRATEGY_DIRECT) {
                 // Return the cluster node.
+                // 直接限流策略
                 return node.getClusterNode();
             }
 
+            // 关联限流策略
             return selectReferenceNode(rule, context, node);
         } else if (RuleConstant.LIMIT_APP_OTHER.equals(limitApp)
             && FlowRuleManager.isOtherOrigin(origin, rule.getResource())) {
@@ -147,11 +156,14 @@ public class FlowRuleChecker {
     private static boolean passClusterCheck(FlowRule rule, Context context, DefaultNode node, int acquireCount,
                                             boolean prioritized) {
         try {
+            // 选择集群服务
             TokenService clusterService = pickClusterService();
             if (clusterService == null) {
                 return fallbackToLocalOrPass(rule, context, node, acquireCount, prioritized);
             }
+            // 全局唯一id
             long flowId = rule.getClusterConfig().getFlowId();
+            // 请求token
             TokenResult result = clusterService.requestToken(flowId, acquireCount, prioritized);
             return applyTokenResult(result, rule, context, node, acquireCount, prioritized);
             // If client is absent, then fallback to local mode.
@@ -160,6 +172,7 @@ public class FlowRuleChecker {
         }
         // Fallback to local flow control when token client or server for this rule is not available.
         // If fallback is not enabled, then directly pass.
+        // 抛出异常本地限制
         return fallbackToLocalOrPass(rule, context, node, acquireCount, prioritized);
     }
 
@@ -174,9 +187,11 @@ public class FlowRuleChecker {
     }
 
     private static TokenService pickClusterService() {
+        // 客户端
         if (ClusterStateManager.isClient()) {
             return TokenClientProvider.getClient();
         }
+        //服务端
         if (ClusterStateManager.isServer()) {
             return EmbeddedClusterTokenServerProvider.getServer();
         }
@@ -201,6 +216,7 @@ public class FlowRuleChecker {
             case TokenResultStatus.BAD_REQUEST:
             case TokenResultStatus.FAIL:
             case TokenResultStatus.TOO_MANY_REQUEST:
+                // 失败降级到本地限制
                 return fallbackToLocalOrPass(rule, context, node, acquireCount, prioritized);
             case TokenResultStatus.BLOCKED:
             default:

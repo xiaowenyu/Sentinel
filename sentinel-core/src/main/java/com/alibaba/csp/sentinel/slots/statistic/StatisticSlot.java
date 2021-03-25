@@ -48,6 +48,7 @@ import com.alibaba.csp.sentinel.slots.block.BlockException;
  * @author jialiang.linjl
  * @author Eric Zhao
  */
+// 第四个优先级
 @Spi(order = Constants.ORDER_STATISTIC_SLOT)
 public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
 
@@ -56,10 +57,13 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
                       boolean prioritized, Object... args) throws Throwable {
         try {
             // Do some checking.
+            // 先到下一层检查
             fireEntry(context, resourceWrapper, node, count, prioritized, args);
 
             // Request passed, add thread count and pass count.
+            // 请求通过，defaultNode和clusterNode加一
             node.increaseThreadNum();
+            // 通过数量加一
             node.addPassRequest(count);
 
             if (context.getCurEntry().getOriginNode() != null) {
@@ -70,11 +74,13 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
 
             if (resourceWrapper.getEntryType() == EntryType.IN) {
                 // Add count for global inbound entry node for global statistics.
+                // 全部入口加一
                 Constants.ENTRY_NODE.increaseThreadNum();
                 Constants.ENTRY_NODE.addPassRequest(count);
             }
 
             // Handle pass event with registered entry callback handlers.
+            // 成功统计回调
             for (ProcessorSlotEntryCallback<DefaultNode> handler : StatisticSlotCallbackRegistry.getEntryCallbacks()) {
                 handler.onPass(context, resourceWrapper, node, count, args);
             }
@@ -98,6 +104,7 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
             context.getCurEntry().setBlockError(e);
 
             // Add block count.
+            // 被拦截加一
             node.increaseBlockQps(count);
             if (context.getCurEntry().getOriginNode() != null) {
                 context.getCurEntry().getOriginNode().increaseBlockQps(count);
@@ -105,11 +112,13 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
 
             if (resourceWrapper.getEntryType() == EntryType.IN) {
                 // Add count for global inbound entry node for global statistics.
+                // 全局被拦截加一
                 Constants.ENTRY_NODE.increaseBlockQps(count);
             }
 
             // Handle block event with registered entry callback handlers.
             for (ProcessorSlotEntryCallback<DefaultNode> handler : StatisticSlotCallbackRegistry.getEntryCallbacks()) {
+                // 被拦截回调
                 handler.onBlocked(e, context, resourceWrapper, node, count, args);
             }
 

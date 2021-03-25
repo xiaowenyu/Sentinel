@@ -23,6 +23,7 @@ import com.alibaba.csp.sentinel.context.Context;
  */
 public class DefaultProcessorSlotChain extends ProcessorSlotChain {
 
+    // 初始化头slot
     AbstractLinkedProcessorSlot<?> first = new AbstractLinkedProcessorSlot<Object>() {
 
         @Override
@@ -37,10 +38,12 @@ public class DefaultProcessorSlotChain extends ProcessorSlotChain {
         }
 
     };
+    // 初始化尾slot
     AbstractLinkedProcessorSlot<?> end = first;
 
     @Override
     public void addFirst(AbstractLinkedProcessorSlot<?> protocolProcessor) {
+        //塞到first中间
         protocolProcessor.setNext(first.getNext());
         first.setNext(protocolProcessor);
         if (end == first) {
@@ -50,6 +53,7 @@ public class DefaultProcessorSlotChain extends ProcessorSlotChain {
 
     @Override
     public void addLast(AbstractLinkedProcessorSlot<?> protocolProcessor) {
+        // 塞到最后
         end.setNext(protocolProcessor);
         end = protocolProcessor;
     }
@@ -69,6 +73,7 @@ public class DefaultProcessorSlotChain extends ProcessorSlotChain {
         return first.getNext();
     }
 
+    // 1.首先进去默认slotChain的entry
     @Override
     public void entry(Context context, ResourceWrapper resourceWrapper, Object t, int count, boolean prioritized, Object... args)
         throws Throwable {

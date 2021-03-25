@@ -39,6 +39,7 @@ public class WarmUpRateLimiterController extends WarmUpController {
         return canPass(node, acquireCount, false);
     }
 
+    // 慢加载匀速器
     @Override
     public boolean canPass(Node node, int acquireCount, boolean prioritized) {
         long previousQps = (long) node.previousPassQps();

@@ -46,6 +46,7 @@ import com.alibaba.csp.sentinel.spi.Spi;
  *
  * @author jialiang.linjl
  */
+// 排第二的slot
 @Spi(isSingleton = false, order = Constants.ORDER_CLUSTER_BUILDER_SLOT)
 public class ClusterBuilderSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
 
@@ -80,8 +81,11 @@ public class ClusterBuilderSlot extends AbstractLinkedProcessorSlot<DefaultNode>
         if (clusterNode == null) {
             synchronized (lock) {
                 if (clusterNode == null) {
+                    // 双重检查锁
                     // Create the cluster node.
+                    // 构造集群节点
                     clusterNode = new ClusterNode(resourceWrapper.getName(), resourceWrapper.getResourceType());
+                    // 资源为key,集群节点 记录 资源统计信息
                     HashMap<ResourceWrapper, ClusterNode> newMap = new HashMap<>(Math.max(clusterNodeMap.size(), 16));
                     newMap.putAll(clusterNodeMap);
                     newMap.put(node.getId(), clusterNode);
@@ -90,6 +94,7 @@ public class ClusterBuilderSlot extends AbstractLinkedProcessorSlot<DefaultNode>
                 }
             }
         }
+        // 上下文节点 设置集群节点
         node.setClusterNode(clusterNode);
 
         /*
@@ -101,6 +106,7 @@ public class ClusterBuilderSlot extends AbstractLinkedProcessorSlot<DefaultNode>
             context.getCurEntry().setOriginNode(originNode);
         }
 
+        // 调用下一层
         fireEntry(context, resourceWrapper, node, count, prioritized, args);
     }
 

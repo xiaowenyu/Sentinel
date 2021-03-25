@@ -27,6 +27,7 @@ import com.alibaba.csp.sentinel.util.StringUtil;
  */
 final class AuthorityRuleChecker {
 
+    // 检查是否通过
     static boolean passCheck(AuthorityRule rule, Context context) {
         String requester = context.getOrigin();
 
@@ -53,10 +54,12 @@ final class AuthorityRuleChecker {
         }
 
         int strategy = rule.getStrategy();
+        // 在黑名单里面
         if (strategy == RuleConstant.AUTHORITY_BLACK && contain) {
             return false;
         }
 
+        // 不在白名单里面
         if (strategy == RuleConstant.AUTHORITY_WHITE && !contain) {
             return false;
         }

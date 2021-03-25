@@ -42,6 +42,7 @@ public class RateLimiterController implements TrafficShapingController {
         return canPass(node, acquireCount, false);
     }
 
+    // 速度控制，滑动窗口计算
     @Override
     public boolean canPass(Node node, int acquireCount, boolean prioritized) {
         // Pass when acquire count is less or equal than 0.

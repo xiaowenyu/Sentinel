@@ -34,6 +34,7 @@ import com.alibaba.csp.sentinel.spi.Spi;
  * @author Carpenter Lee
  * @author Eric Zhao
  */
+// 最后一个slot
 @Spi(order = Constants.ORDER_DEGRADE_SLOT)
 public class DegradeSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
 
@@ -46,10 +47,12 @@ public class DegradeSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
     }
 
     void performChecking(Context context, ResourceWrapper r) throws BlockException {
+        // 根据资源名称获取断路器
         List<CircuitBreaker> circuitBreakers = DegradeRuleManager.getCircuitBreakers(r.getName());
         if (circuitBreakers == null || circuitBreakers.isEmpty()) {
             return;
         }
+        // 遍历断路器
         for (CircuitBreaker cb : circuitBreakers) {
             if (!cb.tryPass(context)) {
                 throw new DegradeException(cb.getRule().getLimitApp(), cb.getRule());
@@ -57,22 +60,29 @@ public class DegradeSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
         }
     }
 
+    // 关闭时
     @Override
     public void exit(Context context, ResourceWrapper r, int count, Object... args) {
         Entry curEntry = context.getCurEntry();
+        // 被限制
         if (curEntry.getBlockError() != null) {
+            //直接到下一层
             fireExit(context, r, count, args);
             return;
         }
         List<CircuitBreaker> circuitBreakers = DegradeRuleManager.getCircuitBreakers(r.getName());
+        //没有断路器
         if (circuitBreakers == null || circuitBreakers.isEmpty()) {
+            // 直接到下一层
             fireExit(context, r, count, args);
             return;
         }
 
         if (curEntry.getBlockError() == null) {
             // passed request
+            // 不被限制，通过
             for (CircuitBreaker circuitBreaker : circuitBreakers) {
+                // 执行请求完成任务
                 circuitBreaker.onRequestComplete(context);
             }
         }

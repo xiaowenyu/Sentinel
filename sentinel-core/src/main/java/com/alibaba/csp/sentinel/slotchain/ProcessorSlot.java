@@ -25,6 +25,7 @@ import com.alibaba.csp.sentinel.context.Context;
  * @author leyou(lihao)
  * @author Eric Zhao
  */
+// 当slot处理完逻辑时通知其他任务
 public interface ProcessorSlot<T> {
 
     /**

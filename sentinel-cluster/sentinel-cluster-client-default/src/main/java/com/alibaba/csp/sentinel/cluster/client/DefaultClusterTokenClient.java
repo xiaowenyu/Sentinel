@@ -151,11 +151,14 @@ public class DefaultClusterTokenClient implements ClusterTokenClient {
         if (notValidRequest(flowId, acquireCount)) {
             return badRequest();
         }
+        // 构造请求参数
         FlowRequestData data = new FlowRequestData().setCount(acquireCount)
             .setFlowId(flowId).setPriority(prioritized);
         ClusterRequest<FlowRequestData> request = new ClusterRequest<>(ClusterConstants.MSG_TYPE_FLOW, data);
         try {
+            // 发送请求
             TokenResult result = sendTokenRequest(request);
+            // 记录响应日志
             logForResult(result);
             return result;
         } catch (Exception ex) {
@@ -209,9 +212,11 @@ public class DefaultClusterTokenClient implements ClusterTokenClient {
                 "[DefaultClusterTokenClient] Client not created, please check your config for cluster client");
             return clientFail();
         }
+        // 发送请求
         ClusterResponse response = transportClient.sendRequest(request);
         TokenResult result = new TokenResult(response.getStatus());
         if (response.getData() != null) {
+            // 解析响应
             FlowTokenResponseData responseData = (FlowTokenResponseData)response.getData();
             result.setRemaining(responseData.getRemainingCount())
                 .setWaitInMs(responseData.getWaitInMs());

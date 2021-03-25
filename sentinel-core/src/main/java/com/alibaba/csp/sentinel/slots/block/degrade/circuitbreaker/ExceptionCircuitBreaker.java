@@ -32,6 +32,7 @@ import static com.alibaba.csp.sentinel.slots.block.RuleConstant.DEGRADE_GRADE_EX
  * @author Eric Zhao
  * @since 1.8.0
  */
+// 异常断路器
 public class ExceptionCircuitBreaker extends AbstractCircuitBreaker {
 
     private final int strategy;
@@ -61,6 +62,7 @@ public class ExceptionCircuitBreaker extends AbstractCircuitBreaker {
         stat.currentWindow().value().reset();
     }
 
+    // 请求完成时
     @Override
     public void onRequestComplete(Context context) {
         Entry entry = context.getCurEntry();
@@ -70,6 +72,7 @@ public class ExceptionCircuitBreaker extends AbstractCircuitBreaker {
         Throwable error = entry.getError();
         SimpleErrorCounter counter = stat.currentWindow().value();
         if (error != null) {
+            // 被限制时，限制数量加一
             counter.getErrorCount().add(1);
         }
         counter.getTotalCount().add(1);
@@ -84,7 +87,9 @@ public class ExceptionCircuitBreaker extends AbstractCircuitBreaker {
         
         if (currentState.get() == State.HALF_OPEN) {
             // In detecting request
+            // 半开状态且请求通过
             if (error == null) {
+                // 闭合断路器
                 fromHalfOpenToClose();
             } else {
                 fromHalfOpenToOpen(1.0d);

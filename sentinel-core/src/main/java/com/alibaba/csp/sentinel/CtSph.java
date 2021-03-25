@@ -143,14 +143,18 @@ public class CtSph implements Sph {
          * Means amount of resources (slot chain) exceeds {@link Constants.MAX_SLOT_CHAIN_SIZE},
          * so no rule checking will be done.
          */
+        // 超过最大链路长度
         if (chain == null) {
             return new CtEntry(resourceWrapper, null, context);
         }
 
+        // 资源、链路、上下文构造 上下文条目
         Entry e = new CtEntry(resourceWrapper, chain, context);
         try {
+            // 进入链路
             chain.entry(context, resourceWrapper, null, count, prioritized, args);
         } catch (BlockException e1) {
+            // 释放资源
             e.exit(count, args);
             throw e1;
         } catch (Throwable e1) {

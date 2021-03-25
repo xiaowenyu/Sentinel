@@ -64,6 +64,7 @@ public final class Constants {
     /**
      * Global statistic node for inbound traffic. Usually used for {@code SystemRule} checking.
      */
+    // 全部入口节点
     public final static ClusterNode ENTRY_NODE = new ClusterNode(TOTAL_IN_RESOURCE_NAME, ResourceTypeConstants.COMMON);
 
     /**
@@ -74,6 +75,7 @@ public final class Constants {
     /**
      * Order of default processor slots
      */
+    // 任务插槽优先级
     public static final int ORDER_NODE_SELECTOR_SLOT = -10000;
     public static final int ORDER_CLUSTER_BUILDER_SLOT = -9000;
     public static final int ORDER_LOG_SLOT = -8000;

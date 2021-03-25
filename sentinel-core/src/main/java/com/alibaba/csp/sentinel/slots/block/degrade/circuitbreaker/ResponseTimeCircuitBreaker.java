@@ -31,6 +31,7 @@ import com.alibaba.csp.sentinel.util.TimeUtil;
  * @author Eric Zhao
  * @since 1.8.0
  */
+// rt断路器
 public class ResponseTimeCircuitBreaker extends AbstractCircuitBreaker {
 
     private static final double SLOW_REQUEST_RATIO_MAX_VALUE = 1.0d;
@@ -61,6 +62,7 @@ public class ResponseTimeCircuitBreaker extends AbstractCircuitBreaker {
         slidingCounter.currentWindow().value().reset();
     }
 
+    // 请求完成时
     @Override
     public void onRequestComplete(Context context) {
         SlowRequestCounter counter = slidingCounter.currentWindow().value();
@@ -74,6 +76,7 @@ public class ResponseTimeCircuitBreaker extends AbstractCircuitBreaker {
         }
         long rt = completeTime - entry.getCreateTimestamp();
         if (rt > maxAllowedRt) {
+            // 慢记录加一
             counter.slowCount.add(1);
         }
         counter.totalCount.add(1);
@@ -92,6 +95,7 @@ public class ResponseTimeCircuitBreaker extends AbstractCircuitBreaker {
             if (rt > maxAllowedRt) {
                 fromHalfOpenToOpen(1.0d);
             } else {
+                //断路器闭合
                 fromHalfOpenToClose();
             }
             return;

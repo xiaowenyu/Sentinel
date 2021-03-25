@@ -216,11 +216,13 @@ public class NettyTransportClient implements ClusterTransportClient {
         try {
             request.setId(xid);
 
+            // 写请求出去
             channel.writeAndFlush(request);
 
             ChannelPromise promise = channel.newPromise();
             TokenClientPromiseHolder.putPromise(xid, promise);
 
+            // 等待响应返回
             if (!promise.await(ClusterClientConfigManager.getRequestTimeout())) {
                 throw new SentinelClusterException(ClusterErrorMessages.REQUEST_TIME_OUT);
             }
@@ -230,6 +232,7 @@ public class NettyTransportClient implements ClusterTransportClient {
                 // Should not go through here.
                 throw new SentinelClusterException(ClusterErrorMessages.UNEXPECTED_STATUS);
             }
+            // 获得响应
             return entry.getValue();
         } finally {
             TokenClientPromiseHolder.remove(xid);

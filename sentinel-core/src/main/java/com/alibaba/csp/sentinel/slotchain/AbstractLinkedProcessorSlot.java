@@ -21,13 +21,15 @@ import com.alibaba.csp.sentinel.context.Context;
  * @author qinan.qn
  * @author jialiang.linjl
  */
+// 链表
 public abstract class AbstractLinkedProcessorSlot<T> implements ProcessorSlot<T> {
 
     private AbstractLinkedProcessorSlot<?> next = null;
 
     @Override
-    public void fireEntry(Context context, ResourceWrapper resourceWrapper, Object obj, int count, boolean prioritized, Object... args)
+    public void  fireEntry(Context context, ResourceWrapper resourceWrapper, Object obj, int count, boolean prioritized, Object... args)
         throws Throwable {
+        // 有下一层
         if (next != null) {
             next.transformEntry(context, resourceWrapper, obj, count, prioritized, args);
         }
@@ -37,12 +39,14 @@ public abstract class AbstractLinkedProcessorSlot<T> implements ProcessorSlot<T>
     void transformEntry(Context context, ResourceWrapper resourceWrapper, Object o, int count, boolean prioritized, Object... args)
         throws Throwable {
         T t = (T)o;
+        // 调下一层
         entry(context, resourceWrapper, t, count, prioritized, args);
     }
 
     @Override
     public void fireExit(Context context, ResourceWrapper resourceWrapper, int count, Object... args) {
         if (next != null) {
+            // 往下释放资源
             next.exit(context, resourceWrapper, count, args);
         }
     }
