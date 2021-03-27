@@ -70,6 +70,7 @@ public class RequestLimiter {
     }
 
     public boolean canPass() {
+        // 判断是否通过
         return getQps() + 1 <= qpsAllowed;
     }
 

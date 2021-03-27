@@ -46,6 +46,7 @@ public class DefaultEmbeddedTokenServer implements EmbeddedClusterTokenServer {
     @Override
     public TokenResult requestToken(Long ruleId, int acquireCount, boolean prioritized) {
         if (tokenService != null) {
+            // 获取结果
             return tokenService.requestToken(ruleId, acquireCount, prioritized);
         }
         return new TokenResult(TokenResultStatus.FAIL);

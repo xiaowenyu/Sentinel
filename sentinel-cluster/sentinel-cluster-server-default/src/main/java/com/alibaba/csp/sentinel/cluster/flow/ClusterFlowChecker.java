@@ -49,16 +49,20 @@ final class ClusterFlowChecker {
 
     static boolean allowProceed(long flowId) {
         String namespace = ClusterFlowRuleManager.getNamespace(flowId);
+        // 判断是否通过
         return GlobalRequestLimiter.tryPass(namespace);
     }
 
     static TokenResult acquireClusterToken(/*@Valid*/ FlowRule rule, int acquireCount, boolean prioritized) {
+        // 规则的flowId
         Long id = rule.getClusterConfig().getFlowId();
 
         if (!allowProceed(id)) {
+            // 太多请求
             return new TokenResult(TokenResultStatus.TOO_MANY_REQUEST);
         }
 
+        // 统计
         ClusterMetric metric = ClusterMetricStatistics.getMetric(id);
         if (metric == null) {
             return new TokenResult(TokenResultStatus.FAIL);

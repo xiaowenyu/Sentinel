@@ -146,6 +146,7 @@ public class DefaultClusterTokenClient implements ClusterTokenClient {
         return serverDescriptor;
     }
 
+    // 客户顿请求
     @Override
     public TokenResult requestToken(Long flowId, int acquireCount, boolean prioritized) {
         if (notValidRequest(flowId, acquireCount)) {

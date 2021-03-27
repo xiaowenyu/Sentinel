@@ -56,6 +56,7 @@ public class TokenServerHandler extends ChannelInboundHandlerAdapter {
         ConnectionManager.removeConnection(remoteAddress);
     }
 
+    // 请求入口
     @Override
     @SuppressWarnings("unchecked")
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

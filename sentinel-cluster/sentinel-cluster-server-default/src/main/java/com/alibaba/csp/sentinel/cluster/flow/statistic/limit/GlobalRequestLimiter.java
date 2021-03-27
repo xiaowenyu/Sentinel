@@ -51,6 +51,7 @@ public final class GlobalRequestLimiter {
         if (limiter == null) {
             return true;
         }
+        // 限流判断
         return limiter.tryPass();
     }
 
