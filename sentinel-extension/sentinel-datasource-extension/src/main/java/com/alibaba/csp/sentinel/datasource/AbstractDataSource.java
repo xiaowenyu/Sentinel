@@ -26,6 +26,7 @@ import com.alibaba.csp.sentinel.property.SentinelProperty;
  * @author Carpenter Lee
  * @author Eric Zhao
  */
+// 拓展持久化接口
 public abstract class AbstractDataSource<S, T> implements ReadableDataSource<S, T> {
 
     protected final Converter<S, T> parser;
@@ -36,15 +37,18 @@ public abstract class AbstractDataSource<S, T> implements ReadableDataSource<S, 
             throw new IllegalArgumentException("parser can't be null");
         }
         this.parser = parser;
+        // 新建动态配置，用于更新规则
         this.property = new DynamicSentinelProperty<T>();
     }
 
+    // 加载配置
     @Override
     public T loadConfig() throws Exception {
         return loadConfig(readSource());
     }
 
     public T loadConfig(S conf) throws Exception {
+        // 解析配置
         T value = parser.convert(conf);
         return value;
     }

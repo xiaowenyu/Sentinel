@@ -60,10 +60,13 @@ public class NacosDataSourceDemo {
         runner.tick();
     }
 
+    // 加载规则
     private static void loadRules() {
+        // 初始化数据源
         ReadableDataSource<String, List<FlowRule>> flowRuleDataSource = new NacosDataSource<>(remoteAddress, groupId, dataId,
                 source -> JSON.parseObject(source, new TypeReference<List<FlowRule>>() {
                 }));
+        // 获取规则
         FlowRuleManager.register2Property(flowRuleDataSource.getProperty());
     }
 

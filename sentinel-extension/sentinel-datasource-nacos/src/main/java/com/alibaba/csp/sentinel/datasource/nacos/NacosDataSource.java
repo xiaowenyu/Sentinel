@@ -46,6 +46,7 @@ public class NacosDataSource<T> extends AbstractDataSource<String, T> {
     /**
      * Single-thread pool. Once the thread pool is blocked, we throw up the old task.
      */
+    // nacos数据源更新线程池
     private final ExecutorService pool = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS,
         new ArrayBlockingQueue<Runnable>(1), new NamedThreadFactory("sentinel-nacos-ds-update"),
         new ThreadPoolExecutor.DiscardOldestPolicy());
@@ -68,6 +69,7 @@ public class NacosDataSource<T> extends AbstractDataSource<String, T> {
      * @param dataId     data ID, cannot be empty
      * @param parser     customized data parser, cannot be empty
      */
+    // 初始化
     public NacosDataSource(final String serverAddr, final String groupId, final String dataId,
                            Converter<String, T> parser) {
         this(NacosDataSource.buildProperties(serverAddr), groupId, dataId, parser);
@@ -91,6 +93,7 @@ public class NacosDataSource<T> extends AbstractDataSource<String, T> {
         this.groupId = groupId;
         this.dataId = dataId;
         this.properties = properties;
+        // 配置nacos监听器
         this.configListener = new Listener() {
             @Override
             public Executor getExecutor() {
@@ -101,8 +104,10 @@ public class NacosDataSource<T> extends AbstractDataSource<String, T> {
             public void receiveConfigInfo(final String configInfo) {
                 RecordLog.info("[NacosDataSource] New property value received for (properties: {}) (dataId: {}, groupId: {}): {}",
                     properties, dataId, groupId, configInfo);
+                // 解析配置内容
                 T newValue = NacosDataSource.this.parser.convert(configInfo);
                 // Update the new value to the property.
+                // 获取DynamicSentinelProperty， 更新配置
                 getProperty().updateValue(newValue);
             }
         };
@@ -110,22 +115,27 @@ public class NacosDataSource<T> extends AbstractDataSource<String, T> {
         loadInitialConfig();
     }
 
+    // 加载初始化的配置
     private void loadInitialConfig() {
         try {
             T newValue = loadConfig();
             if (newValue == null) {
                 RecordLog.warn("[NacosDataSource] WARN: initial config is null, you may have to check your data source");
             }
+            // 更新配置
             getProperty().updateValue(newValue);
         } catch (Exception ex) {
             RecordLog.warn("[NacosDataSource] Error when loading initial config", ex);
         }
     }
 
+    // 初始化nacos的监听器
     private void initNacosListener() {
         try {
+            // 创建nacos配置服务
             this.configService = NacosFactory.createConfigService(this.properties);
             // Add config listener.
+            // 添加配置的监听
             configService.addListener(dataId, groupId, configListener);
         } catch (Exception e) {
             RecordLog.warn("[NacosDataSource] Error occurred when initializing Nacos data source", e);
@@ -133,11 +143,13 @@ public class NacosDataSource<T> extends AbstractDataSource<String, T> {
         }
     }
 
+    // 读取数据
     @Override
     public String readSource() throws Exception {
         if (configService == null) {
             throw new IllegalStateException("Nacos config service has not been initialized or error occurred");
         }
+        // 获取配置
         return configService.getConfig(dataId, groupId, DEFAULT_TIMEOUT);
     }
 
@@ -151,6 +163,7 @@ public class NacosDataSource<T> extends AbstractDataSource<String, T> {
 
     private static Properties buildProperties(String serverAddr) {
         Properties properties = new Properties();
+        // 设置远程服务的地址
         properties.setProperty(PropertyKeyConst.SERVER_ADDR, serverAddr);
         return properties;
     }
